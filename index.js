@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database.config');
 const {syncDatabase} = require('./models/associations')
+const path = require('path');
+
 
 require('dotenv').config();
 
@@ -11,16 +13,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 syncDatabase();
 // Routes
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/authRoutes')
 const uploadRoutes = require('./routes/uploadRoutes');
 const userAddressRoutes = require('./routes/userAddressRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/auth',userRoutes)
 app.use('/api/v1/upload',uploadRoutes)
 app.use('/api/v1/addresses', userAddressRoutes);
+app.use('/api/v1/cart', cartRoutes);
+
 
 // Start server
 sequelize.sync().then(() => {
