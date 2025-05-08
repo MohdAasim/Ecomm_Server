@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '5000:5000'
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: npm run dev # Make sure the correct start command is used
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce_app
+    ports:
+      - '3306:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
+      interval: 30s
+      retries: 10
+      start_period: 60s
+      timeout: 20s
+
+volumes:
+  db-data:
