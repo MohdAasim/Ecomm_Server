@@ -3,6 +3,7 @@ const cors = require('cors');
 const sequelize = require('./config/database.config');
 const {syncDatabase} = require('./models/associations')
 const path = require('path');
+const errorHandler = require('./middlewares/errorHandler');
 
 
 require('dotenv').config();
@@ -28,7 +29,13 @@ app.use('/api/v1/upload',uploadRoutes)
 app.use('/api/v1/addresses', userAddressRoutes);
 app.use('/api/v1/cart', cartRoutes);
 
+app.all('/*splat', (req, res, next) => {
+  const AppError = require('./utils/AppError');
+  return next(new AppError(`Route ${req.originalUrl} not found`, 404));
+});
 
+// Global Error Handler - should be last
+app.use(errorHandler);
 // Start server
 sequelize.sync().then(() => {
   console.log('✅ Database connected and synced');
