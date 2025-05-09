@@ -1,29 +1,27 @@
-const { User, UserAddress } = require('../models/associations');
+const addressRepo = require('../repositories/userAddressRepository');
 
 exports.createAddress = async (userId, addressData) => {
-  const user = await User.findByPk(userId);
+  const user = await addressRepo.findUserById(userId);
   if (!user) throw new Error('User not found');
 
-  return await UserAddress.create({ userId, ...addressData });
+  return await addressRepo.createAddress(userId, addressData);
 };
 
 exports.getAddressesByUser = async (userId) => {
-  return await UserAddress.findAll({ where: { userId } });
+  return await addressRepo.findAddressesByUser(userId);
 };
 
 exports.updateAddress = async (addressId, userId, newData) => {
-  const address = await UserAddress.findOne({ where: { id: addressId, userId } });
+  const address = await addressRepo.findAddressByIdAndUser(addressId, userId);
   if (!address) throw new Error('Address not found');
 
-  await address.update(newData);
-  return address;
+  return await addressRepo.updateAddress(address, newData);
 };
 
 exports.deleteAddress = async (addressId, userId) => {
-  const address = await UserAddress.findOne({ where: { id: addressId, userId } });
+  const address = await addressRepo.findAddressByIdAndUser(addressId, userId);
   if (!address) throw new Error('Address not found');
 
-  await address.destroy();
+  await addressRepo.deleteAddress(address);
   return { message: 'Address deleted successfully' };
 };
-

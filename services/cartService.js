@@ -1,40 +1,31 @@
-const CartItem = require('../models/Cart');
-const Product = require('../models/Product');
+const cartRepo = require('../repositories/cartRepository');
 
 exports.addToCart = async (userId, productId, quantity = 1) => {
-  const [item, created] = await CartItem.findOrCreate({
-    where: { userId, productId },
-    defaults: { quantity }
-  });
+  const [item, created] = await cartRepo.findOrCreateCartItem(userId, productId, quantity);
 
   if (!created) {
-    item.quantity += quantity;
-    await item.save();
+    return await cartRepo.incrementCartItemQuantity(item, quantity);
   }
 
   return item;
 };
 
 exports.getCartItems = async (userId) => {
-  return CartItem.findAll({
-    where: { userId },
-    include: [{ model: Product }]
-  });
+  return await cartRepo.findAllCartItems(userId);
 };
 
 exports.updateCartItem = async (userId, productId, quantity) => {
-  const item = await CartItem.findOne({ where: { userId, productId } });
+  const item = await cartRepo.findCartItem(userId, productId);
   if (!item) throw new Error('Item not found in cart');
-  item.quantity = quantity;
-  await item.save();
-  return item;
+
+  return await cartRepo.updateCartItemQuantity(item, quantity);
 };
 
 exports.removeCartItem = async (userId, productId) => {
-  const deleted = await CartItem.destroy({ where: { userId, productId } });
+  const deleted = await cartRepo.deleteCartItem(userId, productId);
   if (!deleted) throw new Error('Item not found in cart');
 };
 
 exports.clearCart = async (userId) => {
-  await CartItem.destroy({ where: { userId } });
+  await cartRepo.clearCartItems(userId);
 };
