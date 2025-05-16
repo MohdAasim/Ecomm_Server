@@ -8,7 +8,7 @@ const CartItem = sequelize.define('CartItem', {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 1,
-  }
+  },
 });
 
 User.hasMany(CartItem, { foreignKey: 'userId', as: 'cartItems' });

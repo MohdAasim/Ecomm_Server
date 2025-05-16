@@ -9,11 +9,11 @@ services:
     ports:
       - '5000:5000'
     env_file:
-      - .env
+      - .env.dev # Use .env.prod for production
     depends_on:
       db:
         condition: service_healthy
-    command: npm run dev # Make sure the correct start command is used
+    command: npm run dev
 
   db:
     image: mysql:8.0
@@ -26,7 +26,15 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '--host=localhost',
+          '--user=root',
+          '--password=root',
+        ]
       interval: 30s
       retries: 10
       start_period: 60s

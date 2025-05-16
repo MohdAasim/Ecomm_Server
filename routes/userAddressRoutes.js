@@ -8,4 +8,3 @@ router.put('/:addressId', userAddressController.updateAddress);
 router.delete('/:addressId', userAddressController.deleteAddress);
 
 module.exports = router;
-

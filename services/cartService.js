@@ -1,13 +1,26 @@
 const cartRepo = require('../repositories/cartRepository');
 
-exports.addToCart = async (userId, productId, quantity = 1) => {
-  const [item, created] = await cartRepo.findOrCreateCartItem(userId, productId, quantity);
+exports.addMultipleToCart = async (userId, items) => {
+  const results = [];
+  for (const { productId, quantity } of items) {
+    const [item, created] = await cartRepo.findOrCreateCartItem(
+      userId,
+      productId,
+      quantity
+    );
 
-  if (!created) {
-    return await cartRepo.incrementCartItemQuantity(item, quantity);
+    if (!created) {
+      const updatedItem = await cartRepo.incrementCartItemQuantity(
+        item,
+        quantity
+      );
+      results.push(updatedItem);
+    } else {
+      results.push(item);
+    }
   }
 
-  return item;
+  return results;
 };
 
 exports.getCartItems = async (userId) => {
