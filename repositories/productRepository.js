@@ -1,4 +1,3 @@
-const { Op } = require('sequelize');
 const Product = require('../models/Product');
 
 exports.findAndCountProducts = async (filters, limit, offset) => {

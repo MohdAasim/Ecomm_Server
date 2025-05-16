@@ -1,5 +1,6 @@
 const productRepo = require('../repositories/productRepository');
 const { Op } = require('sequelize');
+const { ALLOWED_CATEGORIES } = require('../utils/constants');
 
 exports.getProducts = async (queryParams) => {
   const page = parseInt(queryParams.page) || 1;
@@ -33,7 +34,11 @@ exports.getProducts = async (queryParams) => {
     where.rating = { [Op.gte]: rating };
   }
 
-  const { count, rows } = await productRepo.findAndCountProducts(where, limit, offset);
+  const { count, rows } = await productRepo.findAndCountProducts(
+    where,
+    limit,
+    offset
+  );
 
   return {
     totalItems: count,
@@ -44,10 +49,18 @@ exports.getProducts = async (queryParams) => {
 };
 
 exports.createProduct = async (productData) => {
-  const { name, price } = productData;
+  const { name, price, category } = productData;
 
   if (!name || !price) {
     const error = new Error('Name and price are required.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (category && !ALLOWED_CATEGORIES.includes(category.toLowerCase())) {
+    const error = new Error(
+      `Invalid category. Allowed categories are: ${ALLOWED_CATEGORIES.join(', ')}.`
+    );
     error.statusCode = 400;
     throw error;
   }
