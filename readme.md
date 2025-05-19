@@ -74,7 +74,7 @@ JWT_SECRET=thisIsYourProdJwtSecretKey
 To build and start the containers:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 > Make sure to configure your database container as `db` in your `docker-compose.yml` for `DB_HOST=db` to work.
