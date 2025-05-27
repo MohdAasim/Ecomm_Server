@@ -2,6 +2,18 @@ const productRepo = require('../repositories/productRepository');
 const { Op } = require('sequelize');
 const { ALLOWED_CATEGORIES } = require('../utils/constants');
 
+/**
+ * Get a paginated list of products with optional filters.
+ * @param {Object} queryParams - Query parameters for filtering and pagination.
+ * @param {string} [queryParams.search] - Search term for name/description.
+ * @param {string} [queryParams.category] - Category filter.
+ * @param {number} [queryParams.minPrice] - Minimum price filter.
+ * @param {number} [queryParams.maxPrice] - Maximum price filter.
+ * @param {number} [queryParams.rating] - Minimum rating filter.
+ * @param {number} [queryParams.page] - Page number for pagination.
+ * @param {number} [queryParams.limit] - Items per page.
+ * @returns {Promise<Object>} Paginated products and meta info.
+ */
 exports.getProducts = async (queryParams) => {
   const page = parseInt(queryParams.page) || 1;
   const limit = parseInt(queryParams.limit) || 10;
@@ -48,6 +60,15 @@ exports.getProducts = async (queryParams) => {
   };
 };
 
+/**
+ * Create a new product.
+ * @param {Object} productData - The product data.
+ * @param {string} productData.name - Name of the product.
+ * @param {number} productData.price - Price of the product.
+ * @param {string} productData.category - Category of the product.
+ * @returns {Promise<Object>} The created product.
+ * @throws {Error} If required fields are missing or category is invalid.
+ */
 exports.createProduct = async (productData) => {
   const { name, price, category } = productData;
 
@@ -68,6 +89,12 @@ exports.createProduct = async (productData) => {
   return await productRepo.createProduct(productData);
 };
 
+/**
+ * Get a product by its ID.
+ * @param {number|string} id - The product ID.
+ * @returns {Promise<Object>} The product object.
+ * @throws {Error} If product is not found.
+ */
 exports.getProductById = async (id) => {
   const product = await productRepo.findProductById(id);
   if (!product) {
