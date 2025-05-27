@@ -17,7 +17,12 @@ const Product = sequelize.define(
     category: DataTypes.STRING,
   },
   {
-    timestamps: true, // default, includes createdAt and updatedAt
+    timestamps: true,
+    indexes: [
+      { fields: ['name'] }, // Index for faster search by name
+      { fields: ['category'] }, // Index for filtering by category
+      { fields: ['price'] }, // Index for sorting/filtering by price
+    ],
   }
 );
 

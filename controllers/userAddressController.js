@@ -1,5 +1,6 @@
 const userAddressService = require('../services/userAddressService');
 const STATUS = require('../utils/statusCodes');
+const logger = require('../utils/logger');
 
 exports.createAddress = async (req, res) => {
   const { userId, street, city, state, postalCode, country } = req.body;
@@ -13,8 +14,9 @@ exports.createAddress = async (req, res) => {
       country,
     });
 
-    res.status(STATUS.CREATED).json(address); // 201 Created
+    res.status(STATUS.CREATED).json(address);
   } catch (err) {
+    logger.error('Error creating address: %s', err.message);
     const status =
       err.message === 'User not found' ? STATUS.NOT_FOUND : STATUS.SERVER_ERROR;
     res.status(status).json({ error: err.message });
@@ -26,9 +28,10 @@ exports.getUserAddresses = async (req, res) => {
 
   try {
     const addresses = await userAddressService.getAddressesByUser(userId);
-    res.status(STATUS.OK).json(addresses); // 200 OK
-  } catch {
-    res.status(STATUS.SERVER_ERROR).json({ error: 'Internal server error' }); // 500
+    res.status(STATUS.OK).json(addresses);
+  } catch (err) {
+    logger.error('Error fetching user addresses: %s', err.message);
+    res.status(STATUS.SERVER_ERROR).json({ error: 'Internal server error' });
   }
 };
 
@@ -45,8 +48,9 @@ exports.updateAddress = async (req, res) => {
       country,
     });
 
-    res.status(STATUS.OK).json(updated); // 200 OK
+    res.status(STATUS.OK).json(updated);
   } catch (err) {
+    logger.error('Error updating address: %s', err.message);
     const status =
       err.message === 'Address not found'
         ? STATUS.NOT_FOUND
@@ -61,8 +65,9 @@ exports.deleteAddress = async (req, res) => {
 
   try {
     const result = await userAddressService.deleteAddress(addressId, userId);
-    res.status(STATUS.OK).json(result); // 200 OK
+    res.status(STATUS.OK).json(result);
   } catch (err) {
+    logger.error('Error deleting address: %s', err.message);
     const status =
       err.message === 'Address not found'
         ? STATUS.NOT_FOUND

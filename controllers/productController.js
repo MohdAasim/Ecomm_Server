@@ -1,13 +1,14 @@
 const productService = require('../services/productService');
 const STATUS = require('../utils/statusCodes');
+const logger = require('../utils/logger');
 
 // Controller to handle the request for all products
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await productService.getProducts(req.query);
-    res.status(STATUS.OK).json(products); // 200 OK
+    res.status(STATUS.OK).json(products);
   } catch (err) {
-    console.error('Error fetching products:', err);
+    logger.error('Error fetching products: %s', err.message);
     res.status(STATUS.SERVER_ERROR).json({ error: 'Failed to fetch products' }); // 500
   }
 };
@@ -21,8 +22,9 @@ exports.createProduct = async (req, res) => {
       product: newProduct,
     }); // 201 Created
   } catch (error) {
+    logger.error('Error creating product: %s', error.message);
     const status = error.statusCode || STATUS.SERVER_ERROR;
-    res.status(status).json({ message: error.message }); // 4xx/500
+    res.status(status).json({ message: error.message });
   }
 };
 
@@ -31,9 +33,10 @@ exports.getProductById = async (req, res) => {
   try {
     const productId = req.params.id;
     const product = await productService.getProductById(productId);
-    res.status(STATUS.OK).json({ product }); // 200 OK
+    res.status(STATUS.OK).json({ product });
   } catch (error) {
+    logger.error('Error fetching product by ID: %s', error.message);
     const status = error.statusCode || STATUS.SERVER_ERROR;
-    res.status(status).json({ message: error.message }); // 4xx/500
+    res.status(status).json({ message: error.message });
   }
 };
